@@ -1,0 +1,146 @@
+/**
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+html, body {
+  height: 100%;
+}
+
+.demo-ribbon {
+  width: 100%;
+  height: 100vh;
+  background: url(M31_0811hires.png) no-repeat center center fixed;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+
+.demo-main {
+  margin-top: -100vh;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+
+
+.demo-header .mdl-layout__header-row {
+  padding-left: 10px;
+  padding-bottom: 0px
+
+}
+
+.demo-container {
+  padding-top: 10%;
+  max-width: 1600px;
+  width: calc(100% - 16px);
+  margin: 0 auto;
+}
+
+.demo-content {
+  border-radius: 2px;
+  padding: 80px 56px;
+  margin-bottom: 80px;
+  justify-content: center;
+  margin: 0 auto;
+}
+.mdl-list__item{
+  padding: 0px;
+}
+
+.right-template-list {
+  border-radius: 2px;
+  padding: 80px 56px;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.left-template-list {
+  border-radius: 2px;
+  padding: 8px 1px;
+  align-items: left;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.demo-layout.is-small-screen .demo-content {
+  padding: 40px 28px;
+}
+
+.demo-content h3 {
+  margin-top: 48px;
+}
+
+.demo-footer {
+    bottom: 0;
+    height: 8px;
+    left: 0;
+    position: fixed;
+    width: 100%;
+}
+
+.demo-footer .mdl-mini-footer--link-list a {
+  font-size: 13px;
+}
+.list-templates--link-list a {
+  font-size: 9px;
+  justify-content: center;
+}
+
+.right-template-list {
+  font-size: 9px;
+}
+.render-f {
+  height: 100%;
+}
+
+.select-wrap select {
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  appearance:none;
+  border:none;
+  padding: 0.5em 2em 0.5em 0.5em;
+  background: white;
+  position:relative;
+  cursor:pointer;
+
+}
+.select-wrap {
+  display:inline-block;
+  position:relative;
+  border-left:1px solid #cccccc;
+  border-right:1px solid #cccccc;
+  position: absolute;
+  right: 5px;
+  top: 70vh;
+}
+.select-wrap::after {
+  display:block;
+  width:0px;
+  height:0px;
+  content:"　";
+  position:absolute;
+  right:0.5em;
+  top:50%;
+  margin-top:-0.25em;
+  border-top:0.5em solid #777777;
+  border-left:0.5em solid transparent;
+  border-right:0.5em solid transparent;
+
+
+  -moz-pointer-events: none;
+  -webkit-pointer-events: none;
+  pointer-events: none;
+
+}

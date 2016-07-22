@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<!-- <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,300italic,500,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.1/material.teal-red.min.css" />
+<script src="//storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script> -->
+<form action="" method="post">
+<div class="mdl-grid">
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;" >
+  <h5 style="color:white">String to render with Ninja</h5>
+     <textarea class="mdl-textfield__input" type="text" rows="30" id="text7" style="background-color: #ffffff;" name="string_to_render">{% if entries %}{{ entries.string_to_render }}{% endif %}</textarea>
+  </div>
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;">
+  <h5 style="color:white">JSON to render string with</h5>
+    <textarea class="mdl-textfield__input" type="text" rows="30" id="text7" style="background-color: #ffffff;" name="map">{% if entries %}{{ entries.test_map }}{% endif %}</textarea>
+  </div>
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;">
+  <h5 style="color:white">Output</h5>
+<textarea class="mdl-textfield__input" type="text" rows= "30" id="text7" style="background-color: #ffffff;" name="output">{% if entries %}{{ entries.output }}{% endif %}</textarea>
+  </div>
+</div>
+<span class="select-wrap">
+        <select name="choices">
+            <option value="JSON">JSON</option>
+            <option value="XML">XML</option>
+            <option value="other">Other</option>
+        </select>
+      </span>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" name="render" style="position: absolute; right: 5px; top: 75vh">Render</button>
+</form>
+{% endblock %}
