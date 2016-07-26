@@ -4,13 +4,11 @@ import json
 from flask import Flask, request, session, g, redirect, render_template, flash
 from werkzeug import secure_filename
 from collections import ChainMap
-from jinja2 import FunctionLoader
+from jinja2 import FunctionLoader, TemplateSyntaxError
 import xml.etree.ElementTree as etree
 
-import pncommon.jsonhelpers as jsonhelp
-import pncommon.xmlhelpers as xmlhelp
-import pncommon.assistant as assist
 import brokendown_jinja as jinj
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -112,6 +110,7 @@ def add_entry():
                 db.execute('insert into templates (filename, contents) values (?, ?)',
                            [secure_filename(filename), a])
                 db.commit()
+                db.close()
                 print(type(a))
                 print(a)
                 flash('New template {0} was successfully added'.format(filename))
@@ -119,7 +118,6 @@ def add_entry():
                 flash('Name of file uploaded matches one in database. File not loaded.')
         else:
             flash('Not loaded, filename error')
-    db.close()
     return render_template('input.html')
 
 
@@ -148,7 +146,7 @@ def render_a_template():
         except ValueError:
             flash('Map to render had a JSON exception! See below')
             pretty_dumped = 'Invalid JSON! \n %s' \
-                            % jsonhelp.return_line_no_of_json_value_exc(request.form.get('map'))
+                            % jinj.return_line_no_of_json_value_exc(request.form.get('map'))
             form['test_map'] = pretty_dumped
         else:
             # print('cleaned data',form.cleaned_data['string_to_render'])
@@ -158,17 +156,24 @@ def render_a_template():
             except TypeError:
                 flash('Your template could not be found in the database!')
 
+            except TemplateSyntaxError as err:
+                flash('There was a syntax error in your template! \nDescription: %s' % err.args)
+
             else:
                 try:
                     validated_generated = validate(request.form.get('choices'), generated)
-                except (etree.ParseError, ValueError) as exc:
-                    flash('Incorrect XML/JSON rendered!!')
+                except Exception as exc:
+                    # broad for a reason
+                    flash('Incorrect {0} rendered!!'.format(request.form.get('choices')))
 
                     if isinstance(exc, ValueError):
-                        validated_generated = jsonhelp.return_line_no_of_json_value_exc(generated)
-                    else:
+                        validated_generated = jinj.return_line_no_of_json_value_exc(generated)
+                    elif isinstance(exc, etree.ParseError):
                         line_no, _ = exc.position
-                        validated_generated = assist.return_exc_printed_nice(generated, line_no)
+                        validated_generated = jinj.return_exc_printed_nice(generated, line_no)
+                    else:
+                        flash('Unexpected error! {0}'.format(exc.args))
+                        validated_generated = generated
 
                 form['test_map'] = pretty_dumped
                 form['output'] = validated_generated
@@ -179,10 +184,10 @@ def render_a_template():
 
 def validate(string_type, string_value):
     if string_type == 'JSON':
-        json_safe = jsonhelp.python_to_json(string_value)
-        safe_value = jsonhelp.check_then_dump_json([string_value])[0]
+        json_safe = jinj.python_to_json(string_value)
+        safe_value = jinj.check_then_dump_json([string_value])[0]
     elif string_type == 'XML':
-        safe_value = xmlhelp.pretty_print_xml_tostring(string_value).decode()
+        safe_value = jinj.pretty_print_xml_tostring(string_value).decode()
 
     else:
         safe_value = string_value
