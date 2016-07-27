@@ -182,59 +182,43 @@ def render_a_template():
                     form['test_map'] = pretty_dumped
                     form['output'] = validated_generated
             elif 'check' in request.form:
-                compare_string = request.form.get('compare')
                 output_string = request.form.get('output')
-                choice = request.form.get('choices')
-                if not compare_string or not output_string or choice == 'other':
-                    flash('Need both an ouput and a string to compare to, as well as JSON or XML content-type!')
-                else:
-                    try:
-                        if choice == 'JSON':
-                            compare_xml = jsondiff.json_to_xml(compare_string)
-                            output_xml = jsondiff.json_to_xml(output_string)
-                        elif choice == 'XML':
-                            compare_xml = etree.fromstring(compare_string)
-                            output_xml = etree.fromstring(output_string)
-                    except (ValueError, etree.ParseError) as e:
-                        flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
-                    else:
-                        _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
-                        if not compare_xml_objects and not output_xml_objects:
-                            flash('They match! Good job!')
-                        else:
-                            flash('There are differences! Check Below')
-                            diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
-                            form['failures'] = [diff for diff in diffs]
-
+                msg = {"output_string": output_string}
+                session['messages'] = msg
+                redirect(url_for('.compare'))
     else:
         return render_template('name.html')
     return render_template('name.html', entries=form)
 
+
 @app.route('/compare')
 def compare()
-    compare_string = request.form.get('compare')
-    output_string = request.form.get('output')
-    choice = request.form.get('choices')
-    if not compare_string or not output_string or choice == 'other':
-        flash('Need both an ouput and a string to compare to, as well as JSON or XML content-type!')
+    form = {
+        "string_to_render": request.form.get('string_to_render'),
+        "test_map": request.form.get('map'),
+        "output": request.form.get('output'),
+        "compare": request.form.get('compare')
+        }
+    compare_string = session['messages']['compare_string']
+    output_string = session['messages']['output_string']
+    choice = session['messages']['choice']
+    try:
+        if choice == 'JSON':
+            compare_xml = jsondiff.json_to_xml(compare_string)
+            output_xml = jsondiff.json_to_xml(output_string)
+        elif choice == 'XML':
+            compare_xml = etree.fromstring(compare_string)
+            output_xml = etree.fromstring(output_string)
+    except (ValueError, etree.ParseError) as e:
+        flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
     else:
-        try:
-            if choice == 'JSON':
-                compare_xml = jsondiff.json_to_xml(compare_string)
-                output_xml = jsondiff.json_to_xml(output_string)
-            elif choice == 'XML':
-                compare_xml = etree.fromstring(compare_string)
-                output_xml = etree.fromstring(output_string)
-        except (ValueError, etree.ParseError) as e:
-            flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
+        _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
+        if not compare_xml_objects and not output_xml_objects:
+            flash('They match! Good job!')
         else:
-            _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
-            if not compare_xml_objects and not output_xml_objects:
-                flash('They match! Good job!')
-            else:
-                flash('There are differences! Check Below')
-                diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
-                form['failures'] = [diff for diff in diffs]
+            flash('There are differences! Check Below')
+            diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
+            form['failures'] = [diff for diff in diffs]
 
 
 def validate(string_type, string_value):

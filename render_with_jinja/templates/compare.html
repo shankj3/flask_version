@@ -1,0 +1,31 @@
+{% extends 'name.html' %}
+
+{% block grid_1 %}
+<div class="mdl-grid">
+  <div class="render-f mdl-cell mdl-cell--6-col" style="text-align:center;margin:3;" >
+  <h5 style="color:white">Rendered String to Compare</h5>
+     <textarea class="mdl-textfield__input" type="text" rows="25" id="text7" style="background-color: #ffffff;opacity: 90;" name="string_to_render">{% if entries %}{{ entries.string_to_render }}{% endif %}</textarea>
+  </div>
+    <div class="render-f mdl-cell mdl-cell--6-col" style="text-align:center;margin:3;">
+  <h5 style="color:white">Compare with </h5>
+<textarea class="mdl-textfield__input" type="text" rows= "25" id="text7" style="background-color: #ffffff;opacity: 90;" name="compare">{% if entries %}{{ entries.compare }}{% endif %}</textarea>
+  </div>
+</div>
+{% endblock %}
+{% block inside_form %}
+  <div class="mdl-grid">
+  <div class="mdl-cell mdl-color--white content mdl-color-text--grey-800 mdl-cell--12-col" style="opacity:10;">
+
+     {% if entries %}
+     {% if entries.failures %}
+     <textarea class="mdl-textfield__input" type="text" rows="3" id="text7" style="background-color: #ffffff;opacity:90;color:darkred" name="compare">
+       {% for message in entries.failures %}{{ message }}
+       {% endfor %}
+     </textarea>
+     {% endif %}
+     {% endif %}
+{% endblock %}
+
+  {% block buttons %}
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" type="submit" name="check" style="position: relative; bottom: 10">Compare!</button>
+{% endblock %}

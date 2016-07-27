@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.1/material.teal-red.min.css" />
 <script src="//storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script> -->
 <form action="" method="post">
+{% block grid_1 %}
 <div class="mdl-grid">
   <div class="render-f mdl-cell mdl-cell--3-col" style="text-align:center;margin:3;" >
   <h5 style="color:white">String to render with Ninja</h5>
@@ -19,13 +20,12 @@
   <h5 style="color:white">Output</h5>
 <textarea class="mdl-textfield__input" type="text" rows= "25" id="text7" style="background-color: #ffffff;opacity: 90;" name="output">{% if entries %}{{ entries.output }}{% endif %}</textarea>
   </div>
-    <div class="render-f mdl-cell mdl-cell--3-col" style="text-align:center;margin:3;">
-  <h5 style="color:white">Compare with </h5>
-<textarea class="mdl-textfield__input" type="text" rows= "25" id="text7" style="background-color: #ffffff;opacity: 90;" name="compare">{% if entries %}{{ entries.compare }}{% endif %}</textarea>
-  </div>
 </div>
+{% endblock %}
+
 <div class="mdl-grid">
 <div class="mdl-cell">
+{% block choice_input %}
 <span class="select-wrap">
         <select name="choices">
             <option value="JSON">JSON</option>
@@ -33,20 +33,15 @@
             <option value="other">Other</option>
         </select>
       </span>
+        {% endblock %}
+  {% block buttons %}
 <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" type="submit" name="render" style="position: relative; bottom: 20">Render</button>
 <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" type="submit" name="check" style="position: relative; bottom: 10">Compare</button>
-  </div></div>
-  <div class="mdl-grid">
-  <div class="mdl-cell mdl-color--white content mdl-color-text--grey-800 mdl-cell--12-col" style="opacity:10;">
+{% endblock %}</div></div>
 
-     {% if entries %}
-     {% if entries.failures %}
-     <textarea class="mdl-textfield__input" type="text" rows="3" id="text7" style="background-color: #ffffff;opacity:90;color:darkred" name="compare">
-       {% for message in entries.failures %}{{ message }}
-       {% endfor %}
-     </textarea>
-     {% endif %}
-     {% endif %}
 
+{% block inside_form %}
+
+{% endblock %}
 </form>
 {% endblock %}
