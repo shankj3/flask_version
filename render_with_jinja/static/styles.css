@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 html, body {
   height: 100%;
 }
@@ -23,8 +24,8 @@ html, body {
   height: 100vh;
   background: url(M31_0811hires.png) no-repeat center center fixed;
   -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
 }
 
 .demo-main {
@@ -34,11 +35,14 @@ html, body {
           flex-shrink: 0;
 }
 
+.demo-header: {
+    padding-left: 10px;
+  padding-bottom: 0px;
+}
 
 .demo-header .mdl-layout__header-row {
   padding-left: 10px;
-  padding-bottom: 0px
-
+  padding-bottom: 0px;
 }
 
 .demo-container {
@@ -46,6 +50,9 @@ html, body {
   max-width: 1600px;
   width: calc(100% - 16px);
   margin: 0 auto;
+  margin-bottom:-4px;
+  position:relative;
+  min-height:100%;
 }
 
 .demo-content {
@@ -82,17 +89,7 @@ html, body {
   margin-top: 48px;
 }
 
-.demo-footer {
-    bottom: 0;
-    height: 8px;
-    left: 0;
-    position: fixed;
-    width: 100%;
-}
 
-.demo-footer .mdl-mini-footer--link-list a {
-  font-size: 13px;
-}
 .list-templates--link-list a {
   font-size: 9px;
   justify-content: center;
@@ -102,7 +99,8 @@ html, body {
   font-size: 9px;
 }
 .render-f {
-  height: 100%;
+  height: 90%;
+  opacity: 0.90;
 }
 
 .select-wrap select {
@@ -121,9 +119,8 @@ html, body {
   position:relative;
   border-left:1px solid #cccccc;
   border-right:1px solid #cccccc;
-  position: absolute;
-  right: 5px;
-  top: 70vh;
+  position: relative;
+  bottom: 25;
 }
 .select-wrap::after {
   display:block;
@@ -143,4 +140,11 @@ html, body {
   -webkit-pointer-events: none;
   pointer-events: none;
 
+}
+
+.render-f .mdl-textfield__input {
+    bottom: 0;
+    -webkit-box-sizing: border-box; /* <=iOS4, <= Android  2.3 */
+       -moz-box-sizing: border-box; /* FF1+ */
+            box-sizing: border-box; /* Chrome, IE8, Opera, Safari 5.1*/
 }

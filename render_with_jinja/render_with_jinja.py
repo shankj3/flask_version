@@ -4,10 +4,12 @@ import json
 from flask import Flask, request, session, g, redirect, render_template, flash
 from werkzeug import secure_filename
 from collections import ChainMap
-from jinja2 import FunctionLoader, TemplateSyntaxError
+from jinja2 import FunctionLoader, TemplateSyntaxError, UndefinedError
 import xml.etree.ElementTree as etree
 
 import brokendown_jinja as jinj
+import gibson
+import jsondiff
 
 
 app = Flask(__name__)
@@ -134,8 +136,10 @@ def render_a_template():
         form = {
         "string_to_render": request.form.get('string_to_render'),
         "test_map": request.form.get('map'),
-        "output": ''
+        "output": request.form.get('output'),
+        "compare": request.form.get('compare')
         }
+        print(form)
         try:
             if form.get('test_map'):
                 jinja_map = json.loads(form.get('test_map'))
@@ -149,37 +153,88 @@ def render_a_template():
                             % jinj.return_line_no_of_json_value_exc(request.form.get('map'))
             form['test_map'] = pretty_dumped
         else:
-            # print('cleaned data',form.cleaned_data['string_to_render'])
-            try:
-                generated = jinj.render_string_with_jinja(request.form.get('string_to_render'), env, jinja_map)
-
-            except TypeError:
-                flash('Your template could not be found in the database!')
-
-            except TemplateSyntaxError as err:
-                flash('There was a syntax error in your template! \nDescription: %s' % err.args)
-
-            else:
+            print('FORM',[(k, v) for k,v in request.form.items()])
+            if 'render' in request.form:
+                print("RENDERRRRR")
                 try:
-                    validated_generated = validate(request.form.get('choices'), generated)
-                except Exception as exc:
-                    # broad for a reason
-                    flash('Incorrect {0} rendered!!'.format(request.form.get('choices')))
+                    generated = jinj.render_string_with_jinja(request.form.get('string_to_render'), env, jinja_map)
 
-                    if isinstance(exc, ValueError):
-                        validated_generated = jinj.return_line_no_of_json_value_exc(generated)
-                    elif isinstance(exc, etree.ParseError):
-                        line_no, _ = exc.position
-                        validated_generated = jinj.return_exc_printed_nice(generated, line_no)
+                except Exception as e:
+                    # return string based on what type of exception it is.
+                    flash(return_template_exc(e))
+
+                else:
+                    try:
+                        validated_generated = validate(request.form.get('choices'), generated)
+                    except Exception as exc:
+                        # broad for a reason
+                        flash('Incorrect {0} rendered!!'.format(request.form.get('choices')))
+
+                        if isinstance(exc, ValueError):
+                            validated_generated = jinj.return_line_no_of_json_value_exc(generated)
+                        elif isinstance(exc, etree.ParseError):
+                            line_no, _ = exc.position
+                            validated_generated = jinj.return_exc_printed_nice(generated, line_no)
+                        else:
+                            flash('Unexpected error! {0}'.format(exc.args))
+                            validated_generated = generated
+
+                    form['test_map'] = pretty_dumped
+                    form['output'] = validated_generated
+            elif 'check' in request.form:
+                compare_string = request.form.get('compare')
+                output_string = request.form.get('output')
+                choice = request.form.get('choices')
+                if not compare_string or not output_string or choice == 'other':
+                    flash('Need both an ouput and a string to compare to, as well as JSON or XML content-type!')
+                else:
+                    try:
+                        if choice == 'JSON':
+                            compare_xml = jsondiff.json_to_xml(compare_string)
+                            output_xml = jsondiff.json_to_xml(output_string)
+                        elif choice == 'XML':
+                            compare_xml = etree.fromstring(compare_string)
+                            output_xml = etree.fromstring(output_string)
+                    except (ValueError, etree.ParseError) as e:
+                        flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
                     else:
-                        flash('Unexpected error! {0}'.format(exc.args))
-                        validated_generated = generated
+                        _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
+                        if not compare_xml_objects and not output_xml_objects:
+                            flash('They match! Good job!')
+                        else:
+                            flash('There are differences! Check Below')
+                            diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
+                            form['failures'] = [diff for diff in diffs]
 
-                form['test_map'] = pretty_dumped
-                form['output'] = validated_generated
     else:
         return render_template('name.html')
     return render_template('name.html', entries=form)
+
+@app.route('/compare')
+def compare()
+    compare_string = request.form.get('compare')
+    output_string = request.form.get('output')
+    choice = request.form.get('choices')
+    if not compare_string or not output_string or choice == 'other':
+        flash('Need both an ouput and a string to compare to, as well as JSON or XML content-type!')
+    else:
+        try:
+            if choice == 'JSON':
+                compare_xml = jsondiff.json_to_xml(compare_string)
+                output_xml = jsondiff.json_to_xml(output_string)
+            elif choice == 'XML':
+                compare_xml = etree.fromstring(compare_string)
+                output_xml = etree.fromstring(output_string)
+        except (ValueError, etree.ParseError) as e:
+            flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
+        else:
+            _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
+            if not compare_xml_objects and not output_xml_objects:
+                flash('They match! Good job!')
+            else:
+                flash('There are differences! Check Below')
+                diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
+                form['failures'] = [diff for diff in diffs]
 
 
 def validate(string_type, string_value):
@@ -201,6 +256,14 @@ def is_in_db(filename, db):
         return False
     return True
 
+
+def return_template_exc(exception):
+    if isinstance(exception, TypeError):
+        return 'Your template could not be found in the database!'
+    elif isinstance(e, TemplateSyntaxError) or isinstance(e, UndefinedError):
+        return 'Jinja is not happy! There was an error in your template! \nDescription: %s' % e.args
+    else:
+        return 'Unexpected error! {0}'.format(e.args)
 
 
 # Notes

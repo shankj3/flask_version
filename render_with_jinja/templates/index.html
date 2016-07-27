@@ -53,21 +53,32 @@
     }</style>
                                     </head>
                                     <body>
-                                      <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
-                                        <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+                                    <div class="mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100" style="position:fixed;">
+                                        <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-800">
                                           <div class="mdl-layout__header-row">
                                             <span class="mdl-layout-title">Render with PYNET's Jinja</span>
                                             <div class="mdl-layout-spacer"></div>
+                                            <nav class="mdl-navigation">
+                                                   <a class="mdl-navigation__link mdl-color-text--grey-800" href="{{ url_for('add_entry') }}">Upload Templates</a>
+                                                    <a class="mdl-navigation__link mdl-color-text--grey-800" href="{{ url_for('render_a_template') }}">Render Template</a>
+
+                                                    <a class="mdl-navigation__link mdl-color-text--grey-800" href="{{ url_for('show_entries') }}">List Templates</a>
+
+                                                    <a class="mdl-navigation__link mdl-color-text--grey-800" href="{{ url_for('index') }}">Home</a>
+                                              </nav>
+                                          </div>
                                           </header>
                                           {% with messages = get_flashed_messages() %}
                                             {% if messages %}
-                                              <ul class="">{% for message in messages %}
-                                                <li >
-                                                {{ message }}</li>{% endfor %}
+                                              <ul class="" style="overflow-x:visible;">{% for message in messages %}
+
+                                                {{ message }}<br>{% endfor %}
                                               </ul>
                                             {% endif %}
                                           {% endwith %}
+
                                           <div class="demo-ribbon"></div>
+
                                           <main class="demo-main mdl-layout__content">{% block content %}
                                             <div class="demo-container mdl-grid">
                                               <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
@@ -75,29 +86,13 @@
                                                 <p>This website can be used to practice building and designing good templates.</p>
                                                 <p>You can load in templates to extend from into the database, then you may write your own templates that could be the test case body request/response. When rendering, input a jinja map and the type of final content you are rendering (JSON, XML, Neither). The template will be rendered, and validated if the type selected is XML or JSON.</p>
                                                 <p>See the
-                                                  <a href="http://qatools001.chq.ei/pynet/docs/html/index.html#jinja-test-case-templating">PYNET documentation</a>on templating and the
-                                                  <a href="http://jinja.pocoo.org/docs/dev/templates/">Jinja Designer Template Documentation</a>for tips and tricks designing templates.
+                                                  <a href="http://qatools001.chq.ei/pynet/docs/html/index.html#jinja-test-case-templating">PYNET documentation</a> on templating and the
+                                                  <a href="http://jinja.pocoo.org/docs/dev/templates/">Jinja Designer Template Documentation</a> for tips and tricks designing templates.
                                                 </p>
                                               </div>
                                             </div>{% endblock %}
-                                            <footer class="demo-footer mdl-mini-footer">
-                                              <div class="mdl-mini-footer--left-section">
-                                                <ul class="mdl-mini-footer--link-list">
-                                                  <li>
-                                                    <a href="{{ url_for('add_entry') }}">Upload Templates</a>
-                                                  </li>
-                                                  <li>
-                                                    <a href="{{ url_for('render_a_template') }}">Render Template</a>
-                                                  </li>
-                                                  <li>
-                                                    <a href="{{ url_for('show_entries') }}">List Templates</a>
-                                                  </li>
-                                                  <li>
-                                                    <a href="{{ url_for('index') }}">Home</a>
-                                                  </li>
-                                                </ul>
-                                              </div>
-                                            </footer>
+
+
                                           </main>
                                         </div>
                                         <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
