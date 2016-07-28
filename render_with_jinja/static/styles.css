@@ -17,30 +17,30 @@
 
 html, body {
   height: 100%;
+  background: url(M31_0811hires.png) no-repeat center center fixed;
 }
 
-.demo-ribbon {
-  width: 100%;
-  height: 100vh;
-  background: url(M31_0811hires.png) no-repeat center center fixed;
-  -webkit-flex-shrink: 0;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-}
 
 .demo-main {
-  margin-top: -100vh;
+  background: url(M31_0811hires.png) no-repeat center center fixed;
   -webkit-flex-shrink: 0;
       -ms-flex-negative: 0;
           flex-shrink: 0;
 }
 
-.demo-header: {
-    padding-left: 10px;
+.demo-header {
+ background: url(M31_0811hires.png) no-repeat center center fixed;
   padding-bottom: 0px;
 }
+.flashes{
+background: url(M31_0811hires.png) no-repeat center center fixed;
+
+}
+
 
 .demo-header .mdl-layout__header-row {
+   background: url(M31_0811hires.png) no-repeat center center fixed;
+
   padding-left: 10px;
   padding-bottom: 0px;
 }

@@ -1,7 +1,7 @@
 import os, sys
 import sqlite3
 import json
-from flask import Flask, request, session, g, redirect, render_template, flash
+from flask import Flask, request, session, g, redirect, render_template, flash, url_for
 from werkzeug import secure_filename
 from collections import ChainMap
 from jinja2 import FunctionLoader, TemplateSyntaxError, UndefinedError
@@ -185,40 +185,49 @@ def render_a_template():
                 output_string = request.form.get('output')
                 msg = {"output_string": output_string}
                 session['messages'] = msg
-                redirect(url_for('.compare'))
+                return redirect(url_for('compare'))
     else:
         return render_template('name.html')
     return render_template('name.html', entries=form)
 
 
-@app.route('/compare')
-def compare()
+@app.route('/compare',  methods=['GET', 'POST'])
+def compare():
+    choice = request.form.get('choices')
     form = {
-        "string_to_render": request.form.get('string_to_render'),
-        "test_map": request.form.get('map'),
         "output": request.form.get('output'),
         "compare": request.form.get('compare')
         }
-    compare_string = session['messages']['compare_string']
-    output_string = session['messages']['output_string']
-    choice = session['messages']['choice']
-    try:
-        if choice == 'JSON':
-            compare_xml = jsondiff.json_to_xml(compare_string)
-            output_xml = jsondiff.json_to_xml(output_string)
-        elif choice == 'XML':
-            compare_xml = etree.fromstring(compare_string)
-            output_xml = etree.fromstring(output_string)
-    except (ValueError, etree.ParseError) as e:
-        flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
-    else:
-        _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
-        if not compare_xml_objects and not output_xml_objects:
-            flash('They match! Good job!')
+    # you can only get here from a redirect, which will create the session message. so it's fine to explicitly
+    # call output_string
+    if request.method == 'GET':
+        flash('Add a compare with string and PYNET will compare the rendered string to what you think it should be.')
+        output_string = session['messages']['output_string']
+        form['output'] = output_string
+        form['compare'] = ''
+
+    elif request.method == 'POST':
+        if choice == 'other':
+            flash('Must have either JSON or XML as form type')
+            return render_template('compare.html', entries=form)
+        try:
+            if choice == 'JSON':
+                compare_xml = jsondiff.json_to_xml(form['compare'])
+                output_xml = jsondiff.json_to_xml(form['output'])
+            elif choice == 'XML':
+                compare_xml = etree.fromstring(form['compare'])
+                output_xml = etree.fromstring(form['output'])
+        except (ValueError, etree.ParseError) as e:
+            flash('Exception in loading strings in {0} format! Exception: {1}'.format(choice, e.args))
         else:
-            flash('There are differences! Check Below')
-            diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
-            form['failures'] = [diff for diff in diffs]
+            _, compare_xml_objects, output_xml_objects = gibson.diff_xml(compare_xml, output_xml, False)
+            if not compare_xml_objects and not output_xml_objects:
+                flash('They match! Good job!')
+            else:
+                flash('There are differences! Check Below')
+                diffs = gibson.pretty_print_differences(compare_xml_objects, output_xml_objects)
+                form['failures'] = [diff for diff in diffs]
+    return render_template('compare.html', entries=form)
 
 
 def validate(string_type, string_value):

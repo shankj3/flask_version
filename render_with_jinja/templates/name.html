@@ -8,15 +8,15 @@
 <form action="" method="post">
 {% block grid_1 %}
 <div class="mdl-grid">
-  <div class="render-f mdl-cell mdl-cell--3-col" style="text-align:center;margin:3;" >
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;" >
   <h5 style="color:white">String to render with Ninja</h5>
      <textarea class="mdl-textfield__input" type="text" rows="25" id="text7" style="background-color: #ffffff;opacity: 90;" name="string_to_render">{% if entries %}{{ entries.string_to_render }}{% endif %}</textarea>
   </div>
-  <div class="render-f mdl-cell mdl-cell--3-col" style="text-align:center;margin:3;">
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;">
   <h5 style="color:white">JSON to render string with</h5>
     <textarea class="mdl-textfield__input" type="text" rows="25" id="text7" style="background-color: #ffffff;opacity: 90;" name="map">{% if entries %}{{ entries.test_map }}{% endif %}</textarea>
   </div>
-  <div class="render-f mdl-cell mdl-cell--3-col" style="text-align:center;margin:3;">
+  <div class="render-f mdl-cell mdl-cell--4-col" style="text-align:center;margin:3;">
   <h5 style="color:white">Output</h5>
 <textarea class="mdl-textfield__input" type="text" rows= "25" id="text7" style="background-color: #ffffff;opacity: 90;" name="output">{% if entries %}{{ entries.output }}{% endif %}</textarea>
   </div>
